@@ -446,31 +446,31 @@ class LinkTreePro {
         <button class="video-modal-close">&times;</button>
         <div class="video-container">
           <div class="video-placeholder-large">
-            <h3>🎬 LinkTree Pro Demo</h3>
-            <p>Watch how easy it is to create your stunning link page!</p>
+            <h3>🎬 عرض لينك تري برو</h3>
+            <p>شاهد كم هو سهل إنشاء صفحة روابطك الرائعة!</p>
             <div class="demo-steps">
               <div class="demo-step">
                 <span class="step-number">1</span>
-                <span class="step-text">Choose your template</span>
+                <span class="step-text">اختر قالبك</span>
               </div>
               <div class="demo-step">
                 <span class="step-number">2</span>
-                <span class="step-text">Add your links</span>
+                <span class="step-text">أضف روابطك</span>
               </div>
               <div class="demo-step">
                 <span class="step-number">3</span>
-                <span class="step-text">Customize your style</span>
+                <span class="step-text">خصّص أسلوبك</span>
               </div>
               <div class="demo-step">
                 <span class="step-number">4</span>
-                <span class="step-text">Go live in seconds!</span>
+                <span class="step-text">انشر في ثوانٍ!</span>
               </div>
             </div>
             <div class="demo-features-preview">
-              <div class="feature-preview">✨ Beautiful animations</div>
-              <div class="feature-preview">📱 Mobile-first design</div>
-              <div class="feature-preview">🎨 Unlimited customization</div>
-              <div class="feature-preview">📊 Real-time analytics</div>
+              <div class="feature-preview">✨ رسوم متحركة جميلة</div>
+              <div class="feature-preview">📱 تصميم يُقدّم الجوال أولاً</div>
+              <div class="feature-preview">🎨 تخصيص غير محدود</div>
+              <div class="feature-preview">📊 تحليلات في الوقت الفعلي</div>
             </div>
           </div>
         </div>
@@ -501,20 +501,20 @@ class LinkTreePro {
       <div class="pricing-modal-content">
         <button class="pricing-modal-close">&times;</button>
         <div class="pricing-modal-header">
-          <h3>🚀 Get Started with ${plan}</h3>
-          <p>You're just one step away from creating your amazing link page!</p>
+          <h3>🚀 ابدأ مع ${plan}</h3>
+          <p>أنت على بُعد خطوة واحدة من إنشاء صفحة روابطك الرائعة!</p>
         </div>
         <div class="pricing-modal-body">
           <div class="signup-form">
-            <input type="email" placeholder="Enter your email" class="signup-input">
-            <input type="text" placeholder="Choose your username" class="signup-input">
-            <button class="signup-btn">Create My Page</button>
+            <input type="email" placeholder="أدخل بريدك الإلكتروني" class="signup-input">
+            <input type="text" placeholder="اختر اسم المستخدم" class="signup-input">
+            <button class="signup-btn">إنشاء صفحتي</button>
           </div>
           <div class="pricing-benefits">
-            <div class="benefit">✓ 14-day free trial</div>
-            <div class="benefit">✓ No credit card required</div>
-            <div class="benefit">✓ Cancel anytime</div>
-            <div class="benefit">✓ 24/7 support</div>
+            <div class="benefit">✓ تجربة مجانية لمدة 14 يوماً</div>
+            <div class="benefit">✓ لا حاجة لبطاقة ائتمان</div>
+            <div class="benefit">✓ إلغاء في أي وقت</div>
+            <div class="benefit">✓ دعم على مدار الساعة</div>
           </div>
         </div>
       </div>
@@ -538,7 +538,7 @@ class LinkTreePro {
     
     const signupBtn = pricingModal.querySelector('.signup-btn');
     signupBtn.addEventListener('click', () => {
-      signupBtn.textContent = 'Creating...';
+      signupBtn.textContent = 'جاري الإنشاء...';
       signupBtn.disabled = true;
       
       setTimeout(() => {
@@ -546,7 +546,7 @@ class LinkTreePro {
         setTimeout(() => {
           pricingModal.remove();
           document.body.style.overflow = '';
-          this.showSuccessMessage(`Welcome to ${plan}! 🎉`);
+          this.showSuccessMessage(`مرحباً بك في ${plan}! 🎉`);
         }, 300);
       }, 2000);
     });
@@ -596,7 +596,7 @@ class LinkTreePro {
   preloadAssets() {
     // Preload critical fonts and images
     const fontLinks = [
-      'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap'
+      'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;800;900&display=swap'
     ];
     
     fontLinks.forEach(href => {
