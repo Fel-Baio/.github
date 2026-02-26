@@ -17,6 +17,7 @@ class LinkTreePro {
     this.initTypewriter();
     this.initCursorEffects();
     this.initSmoothScroll();
+    this.initCounterAnimation();
     this.preloadAssets();
   }
 
@@ -608,6 +609,51 @@ class LinkTreePro {
     });
   }
 
+  initCounterAnimation() {
+    const statNumbers = document.querySelectorAll('.stat-number[data-count]');
+    if (!statNumbers.length) return;
+
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = el.getAttribute('data-count');
+        if (!target) return;
+
+        const hasPlus = target.includes('+');
+        const isPercent = target.includes('%');
+        const numStr = target.replace(/[^0-9.]/g, '');
+        const num = parseFloat(numStr);
+        const isDecimal = numStr.includes('.');
+        const duration = 2000;
+        const startTime = performance.now();
+
+        const animate = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = num * eased;
+
+          let display = isDecimal
+            ? current.toLocaleString('ar-SA', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+            : Math.floor(current).toLocaleString('ar-SA');
+          if (hasPlus) display += '+';
+          if (isPercent) display += '%';
+          el.textContent = display;
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          }
+        };
+
+        requestAnimationFrame(animate);
+        counterObserver.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+
+    statNumbers.forEach(el => counterObserver.observe(el));
+  }
+
   // Utility functions
   debounce(func, wait) {
     let timeout;
@@ -722,7 +768,7 @@ const additionalStyles = `
   .video-modal-close {
     position: absolute;
     top: var(--space-4);
-    right: var(--space-4);
+    inset-inline-end: var(--space-4);
     background: none;
     border: none;
     font-size: var(--font-size-2xl);
@@ -841,7 +887,7 @@ const additionalStyles = `
   .pricing-modal-close {
     position: absolute;
     top: var(--space-4);
-    right: var(--space-4);
+    inset-inline-end: var(--space-4);
     background: none;
     border: none;
     font-size: var(--font-size-2xl);
@@ -927,7 +973,7 @@ const additionalStyles = `
   .success-toast {
     position: fixed;
     top: var(--space-8);
-    right: var(--space-8);
+    inset-inline-end: var(--space-8);
     background: var(--success);
     color: white;
     padding: var(--space-4) var(--space-6);
