@@ -634,9 +634,10 @@ class LinkTreePro {
           const eased = 1 - Math.pow(1 - progress, 3);
           const current = num * eased;
 
+          const locale = document.documentElement.lang || 'ar';
           let display = isDecimal
-            ? current.toLocaleString('ar-SA', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-            : Math.floor(current).toLocaleString('ar-SA');
+            ? current.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+            : Math.floor(current).toLocaleString(locale);
           if (hasPlus) display += '+';
           if (isPercent) display += '%';
           el.textContent = display;

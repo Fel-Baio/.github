@@ -1791,17 +1791,20 @@ body {
 }
 /* Accessibility: Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-
   .gradient-orb,
   .particle,
   .logo-icon,
-  .phone-mockup {
+  .phone-mockup,
+  .avatar-ring,
+  .hero-badge,
+  .hero-title,
+  .hero-description,
+  .hero-actions,
+  .hero-stats,
+  .hero-visual,
+  .demo-profile,
+  .demo-link {
     animation: none !important;
+    transition-duration: 0.01ms !important;
   }
 }
