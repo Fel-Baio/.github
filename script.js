@@ -18,7 +18,7 @@ class Colosseum {
     this.initRevealObserver();
     this.initSmoothScroll();
     this.initCounterAnimation();
-    this.injectDynamicStyles();
+    // Dynamic styles are in styles.css
   }
 
   // ── Event Listeners ──────────────────────────────────────
@@ -101,15 +101,16 @@ class Colosseum {
     if (!toggle) return;
 
     // Dark is default; respect saved preference
-    const saved = localStorage.getItem('colosseum-theme');
-    const initial = saved || 'dark';
+    let saved = 'dark';
+    try { saved = localStorage.getItem('colosseum-theme') || 'dark'; } catch (_) { /* unavailable */ }
+    const initial = saved;
     this.applyTheme(initial, themeIcon);
 
     toggle.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme') || 'dark';
       const next    = current === 'dark' ? 'light' : 'dark';
       this.applyTheme(next, themeIcon);
-      localStorage.setItem('colosseum-theme', next);
+      try { localStorage.setItem('colosseum-theme', next); } catch (_) { /* unavailable */ }
     });
   }
 
@@ -380,11 +381,27 @@ class Colosseum {
     modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
 
     const signupBtn = modal.querySelector('.signup-btn');
+    // Accessible live region for validation errors
+    const liveRegion = document.createElement('span');
+    liveRegion.setAttribute('role', 'alert');
+    liveRegion.setAttribute('aria-live', 'assertive');
+    liveRegion.className = 'form-error-msg';
+    liveRegion.style.display = 'none';
+    signupBtn.insertAdjacentElement('beforebegin', liveRegion);
+
     signupBtn.addEventListener('click', () => {
       const emailInput = modal.querySelector('input[type="email"]');
-      const email = emailInput?.value?.trim();
-      if (email && !email.includes('@')) {
-        emailInput.style.borderColor = 'var(--error)';
+      const email = emailInput?.value?.trim() || '';
+      // RFC-5321 simplified pattern — rejects obvious invalids
+      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (email && !validEmail) {
+        emailInput.classList.add('input-error');
+        liveRegion.style.display = 'block';
+        liveRegion.textContent = 'يرجى إدخال بريد إلكتروني صحيح';
+        emailInput.addEventListener('input', () => {
+          emailInput.classList.remove('input-error');
+          liveRegion.style.display = 'none';
+        }, { once: true });
         return;
       }
       signupBtn.textContent = 'جاري الإنشاء...';
@@ -417,288 +434,6 @@ class Colosseum {
     };
   }
 
-  // ── Dynamic Styles (JS-created elements) ─────────────────
-  injectDynamicStyles() {
-    const css = `
-      /* Scroll progress */
-      .scroll-progress-bar {
-        position: fixed;
-        top: 0; left: 0;
-        height: 2.5px;
-        background: linear-gradient(90deg, var(--primary-500), var(--secondary-400));
-        z-index: 200;
-        transition: width 0.15s linear;
-        border-radius: 0 2px 2px 0;
-        pointer-events: none;
-      }
-
-      /* Video modal */
-      .video-modal,
-      .pricing-modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(5, 2, 1, 0.85);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.32s ease;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-      }
-
-      .video-modal.active,
-      .pricing-modal.active { opacity: 1; }
-
-      .video-modal-content,
-      .pricing-modal-content {
-        background: var(--bg-secondary);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-2xl);
-        padding: var(--space-8);
-        max-width: 640px;
-        width: 92%;
-        max-height: 90vh;
-        overflow-y: auto;
-        position: relative;
-        transform: scale(0.88) translateY(20px);
-        transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
-        font-family: var(--font-family-primary);
-        box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(196,73,26,0.15);
-      }
-
-      .pricing-modal-content { max-width: 480px; }
-
-      .video-modal.active .video-modal-content,
-      .pricing-modal.active .pricing-modal-content { transform: scale(1) translateY(0); }
-
-      .video-modal-close,
-      .pricing-modal-close {
-        position: absolute;
-        top: var(--space-4);
-        inset-inline-end: var(--space-4);
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        font-size: var(--font-size-xl);
-        cursor: pointer;
-        color: var(--text-secondary);
-        width: 34px; height: 34px;
-        border-radius: var(--radius-lg);
-        display: flex; align-items: center; justify-content: center;
-        font-family: var(--font-family-primary);
-        transition: all 0.2s ease;
-      }
-
-      .video-modal-close:hover,
-      .pricing-modal-close:hover {
-        background: var(--primary-800);
-        border-color: var(--primary-500);
-        color: var(--gray-50);
-      }
-
-      .video-placeholder-large {
-        text-align: center;
-        padding: var(--space-10);
-        background: linear-gradient(135deg, rgba(196,73,26,0.08), rgba(201,136,18,0.06));
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-xl);
-      }
-
-      .video-placeholder-large h3 {
-        font-family: var(--font-family-primary);
-        font-size: var(--font-size-2xl);
-        font-weight: var(--font-weight-bold);
-        margin-bottom: var(--space-2);
-        color: var(--text-primary);
-      }
-
-      .video-placeholder-large p {
-        font-family: var(--font-family-primary);
-        color: var(--text-secondary);
-        margin-bottom: var(--space-8);
-        font-size: var(--font-size-lg);
-      }
-
-      .demo-steps {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-3);
-        margin-bottom: var(--space-8);
-      }
-
-      .demo-step {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-        padding: var(--space-4);
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-xl);
-        transition: all 0.2s ease;
-        font-family: var(--font-family-primary);
-      }
-
-      .demo-step:hover {
-        border-color: var(--primary-700);
-        background: rgba(196,73,26,0.08);
-      }
-
-      .step-number {
-        width: 32px; height: 32px;
-        background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
-        color: var(--gray-50);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-family: var(--font-family-primary);
-        font-weight: var(--font-weight-black);
-        font-size: var(--font-size-base);
-        flex-shrink: 0;
-        box-shadow: 0 3px 10px rgba(196,73,26,0.4);
-      }
-
-      .step-text {
-        font-family: var(--font-family-primary);
-        font-weight: var(--font-weight-semibold);
-        color: var(--text-primary);
-        font-size: var(--font-size-base);
-      }
-
-      .demo-features-preview {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-2);
-      }
-
-      .feature-preview {
-        font-family: var(--font-family-primary);
-        padding: var(--space-2) var(--space-3);
-        background: rgba(196,73,26,0.07);
-        border: 1px solid rgba(196,73,26,0.15);
-        border-radius: var(--radius-lg);
-        font-size: var(--font-size-sm);
-        color: var(--text-secondary);
-        text-align: center;
-      }
-
-      /* Pricing modal */
-      .pricing-modal-header {
-        text-align: center;
-        margin-bottom: var(--space-6);
-      }
-
-      .pricing-modal-header h3 {
-        font-family: var(--font-family-primary);
-        font-size: var(--font-size-2xl);
-        font-weight: var(--font-weight-bold);
-        margin-bottom: var(--space-2);
-        color: var(--text-primary);
-      }
-
-      .pricing-modal-header p {
-        font-family: var(--font-family-primary);
-        color: var(--text-secondary);
-      }
-
-      .signup-form { margin-bottom: var(--space-5); }
-
-      .signup-input {
-        width: 100%;
-        padding: var(--space-4);
-        border: 1.5px solid var(--border-color);
-        border-radius: var(--radius-xl);
-        font-family: var(--font-family-primary);
-        font-size: var(--font-size-base);
-        margin-bottom: var(--space-3);
-        background: var(--bg-tertiary);
-        color: var(--text-primary);
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        text-align: start;
-      }
-
-      .signup-input:focus {
-        outline: none;
-        border-color: var(--primary-500);
-        box-shadow: 0 0 0 3px rgba(196,73,26,0.15);
-      }
-
-      .signup-btn {
-        width: 100%;
-        padding: var(--space-4);
-        background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
-        color: var(--gray-50);
-        border: none;
-        border-radius: var(--radius-xl);
-        font-family: var(--font-family-primary);
-        font-size: var(--font-size-lg);
-        font-weight: var(--font-weight-bold);
-        cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-        box-shadow: 0 5px 18px rgba(196,73,26,0.4);
-      }
-
-      .signup-btn:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 28px rgba(196,73,26,0.55);
-      }
-
-      .signup-btn:disabled {
-        opacity: 0.65;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .pricing-benefits {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-2);
-        padding: var(--space-4);
-        background: rgba(196,73,26,0.05);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-xl);
-      }
-
-      .benefit {
-        font-family: var(--font-family-primary);
-        color: var(--text-secondary);
-        font-size: var(--font-size-sm);
-      }
-
-      .benefit::before { color: var(--success); font-weight: 900; }
-
-      /* Toast */
-      .success-toast {
-        position: fixed;
-        top: var(--space-8);
-        inset-inline-end: var(--space-6);
-        background: linear-gradient(135deg, var(--primary-700), var(--primary-900));
-        border: 1px solid var(--primary-500);
-        color: var(--gray-50);
-        font-family: var(--font-family-primary);
-        font-weight: var(--font-weight-semibold);
-        padding: var(--space-4) var(--space-6);
-        border-radius: var(--radius-xl);
-        box-shadow: 0 8px 28px rgba(196,73,26,0.45);
-        z-index: 2000;
-        transform: translateX(calc(100% + 40px));
-        transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-        max-width: 320px;
-      }
-
-      .success-toast.active { transform: translateX(0); }
-
-      /* Responsive */
-      @media (max-width: 640px) {
-        .demo-steps          { grid-template-columns: 1fr; }
-        .demo-features-preview { grid-template-columns: 1fr; }
-        .success-toast { inset-inline-end: var(--space-3); inset-inline-start: var(--space-3); max-width: none; }
-      }
-    `;
-
-    const style = document.createElement('style');
-    style.textContent = css;
-    document.head.appendChild(style);
-  }
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────
